@@ -26,12 +26,12 @@ namespace ProPublica.Tests
         public void CompareVotePositionsTest()
         {
             var members = GetMembers();
-            var response = _api.CompareVotePositions(
+            var result = _api.CompareVotePositions(
                 members.LastOrDefault().id,
                 members.FirstOrDefault().id, 
                 DEFAULT_CONGRESS, 
                 SENATE);
-            Assert.IsNotNull(response?.results);
+            Assert.IsNotNull(result);
         }
     }
 }

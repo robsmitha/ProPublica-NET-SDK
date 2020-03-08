@@ -1,12 +1,16 @@
-﻿using ProPublica.Entities;
+﻿using AutoMapper;
+using ProPublica.Entities;
 using ProPublica.Entities.Bills;
 using ProPublica.Entities.Committee;
 using ProPublica.Entities.Lobbying;
 using ProPublica.Entities.Members;
 using ProPublica.Entities.Statements;
 using ProPublica.Entities.Votes;
+using ProPublica.Models;
+using ProPublica.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -18,9 +22,16 @@ namespace ProPublica
     {
         private const string Endpoint = "https://api.propublica.org/congress/v1";
         private string ApiKey { get; set; }
+        private readonly IMapper _mapper;
         public ProPublicaApi(string apiKey = null)
         {
             ApiKey = apiKey;
+
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+            _mapper = mappingConfig.CreateMapper();
         }
 
         private string GetRequestUri(string function) => Endpoint + (!function.StartsWith("/") ? $"/{function}" : function);
@@ -58,11 +69,21 @@ namespace ProPublica
 
         #region Members
 
-        public Response<IEnumerable<MemberListResult>> GetMembers(string congress, string chamber) =>
-            Send<Response<IEnumerable<MemberListResult>>>($"{congress}/{chamber}/members.json");
-
-        public Response<List<Member>> GetMember(string memberId) =>
-            Send<Response<List<Member>>>($"members/{memberId}.json");
+        public List<MemberModel> GetMembers(string congress, string chamber)
+        {
+            var response = Send<Response<IEnumerable<MemberListResult>>>($"{congress}/{chamber}/members.json");
+            var members = response.results.Select(m => m.members).FirstOrDefault();
+            var model = _mapper.Map<List<MemberModel>>(members);
+            return model;
+        }
+        public MemberModel GetMember(string memberId)
+        {
+            var response = Send<Response<List<Member>>>($"members/{memberId}.json");
+            var member = response.results.FirstOrDefault();
+            var model = _mapper.Map<MemberModel>(member);
+            return model;
+        }
+           
 
         public Response<List<MemberListResult>> GetNewMembers() =>
             Send<Response<List<MemberListResult>>>($"members/new.json");
@@ -79,8 +100,13 @@ namespace ProPublica
         public Response<IEnumerable<MemberVotesResult>> GetMemberVotes(string memberId) =>
             Send<Response<IEnumerable<MemberVotesResult>>>($"members/{memberId}/votes.json");
 
-        public Response<IEnumerable<CompareVotePositionsResult>> CompareVotePositions(string firstMemberId, string secondMemberId, string congress, string chamber) =>
-            Send<Response<IEnumerable<CompareVotePositionsResult>>>($"members/{firstMemberId}/votes/{secondMemberId}/{congress}/{chamber}.json");
+        public CompareVotePositionsModel CompareVotePositions(string firstMemberId, string secondMemberId, string congress, string chamber)
+        {
+            var response = Send<Response<IEnumerable<CompareVotePositionsResult>>>($"members/{firstMemberId}/votes/{secondMemberId}/{congress}/{chamber}.json");
+            var result = response.results.FirstOrDefault();
+            var model = _mapper.Map<CompareVotePositionsModel>(result);
+            return model;
+        }
 
         public Response<IEnumerable<CompareBillSponsorshipsResult>> CompareBillSponsorships(string firstMemberId, string secondMemberId, string congress, string chamber) =>
             Send<Response<IEnumerable<CompareBillSponsorshipsResult>>>($"members/{firstMemberId}/bills/{secondMemberId}/{congress}/{chamber}.json");
@@ -157,13 +183,24 @@ namespace ProPublica
         public async Task<BillsResponse<List<UpcomingBills>>> GetUpcomingBillsAsync(string chamber) =>
             await SendAsync<BillsResponse<List<UpcomingBills>>>($"bills/upcoming/{chamber}.json");
 
-        public BillsResponse<List<UpcomingBills>> GetUpcomingBills(string chamber) =>
-            Send<BillsResponse<List<UpcomingBills>>>($"bills/upcoming/{chamber}.json");
+        public List<BillModel> GetUpcomingBills(string chamber)
+        {
+            var response = Send<BillsResponse<List<UpcomingBills>>>($"bills/upcoming/{chamber}.json");
+            var bills = response.results.Select(m => m.bills).FirstOrDefault();
+            var model = _mapper.Map<List<BillModel>>(bills);
+            return model;
+        }
 
         public async Task<BillsResponse<List<Bill>>> GetBillAsync(string congress, string billId) =>
             await SendAsync<BillsResponse<List<Bill>>>($"{congress}/bills/{billId}.json");
-        public BillsResponse<List<Bill>> GetBill(string congress, string billId) =>
-            Send<BillsResponse<List<Bill>>>($"{congress}/bills/{billId}.json");
+        public BillModel GetBill(string congress, string billId)
+        {
+            var response = Send<BillsResponse<List<Bill>>>($"{congress}/bills/{billId}.json");
+            var bill = response.results.Select(b => b).FirstOrDefault();
+            var model = _mapper.Map<BillModel>(bill);
+            return model;
+        }
+            
 
         public async Task<Response<List<BillAmendments>>> GetBillAmendmentsAsync(string congress, string billId) =>
             await SendAsync<Response<List<BillAmendments>>>($"{congress}/bills/{billId}/amendments.json");

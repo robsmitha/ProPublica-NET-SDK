@@ -11,20 +11,16 @@ namespace ProPublica.Tests
         [Test]
         public void GetRecentBillsTest()
         {
-            var response = _api.GetUpcomingBills(HOUSE);
-            var bills = response.results.Select(m => m.bills).FirstOrDefault();
+            var bills = _api.GetUpcomingBills(HOUSE);
             Assert.IsNotNull(bills);
         }
 
         [Test]
         public void GetBill()
         {
-            var upcomingBillResponse = _api.GetUpcomingBills(HOUSE);
-            var bills = upcomingBillResponse.results.Select(m => m.bills).FirstOrDefault();
+            var bills = _api.GetUpcomingBills(HOUSE);
             var upcomingBill = bills.FirstOrDefault();
-            var billId = upcomingBill?.bill_slug;
-            var billResponse = _api.GetBill(upcomingBill?.congress, billId);
-            var bill = billResponse.results.Select(b => b).FirstOrDefault();
+            var bill = _api.GetBill(upcomingBill?.congress, upcomingBill?.bill_slug);
             Assert.IsNotNull(bill);
         }
     }
