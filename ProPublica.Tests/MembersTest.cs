@@ -52,5 +52,12 @@ namespace ProPublica.Tests
             var members = ProPublica.Members.GetMembersLeaving(DEFAULT_CONGRESS, HOUSE);
             Assert.IsNotNull(members);
         }
+        [Test]
+        public void GetMemberVotes()
+        {
+            var member = ProPublica.Members.GetMembers(DEFAULT_CONGRESS, HOUSE).FirstOrDefault();
+            var votes = ProPublica.Members.GetMemberVotes(member?.id);
+            Assert.IsNotNull(votes);
+        }
     }
 }

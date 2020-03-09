@@ -33,8 +33,13 @@ namespace ProPublica
             try
             {
                 var requestUri = GetRequestUri(function);
-                var response = client.GetStringAsync(requestUri).Result;
-                return JsonSerializer.Deserialize<T>(response);
+                var response = client.GetAsync(requestUri).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<T>(response.Content.ReadAsStringAsync().Result);
+                }
+                return default;
+                
             }
             catch (HttpRequestException e)
             {
@@ -49,8 +54,12 @@ namespace ProPublica
             try
             {
                 var requestUri = GetRequestUri(function);
-                var response = await client.GetStringAsync(requestUri);
-                return JsonSerializer.Deserialize<T>(response);
+                var response = await client.GetAsync(requestUri);
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync());
+                }
+                return default;
             }
             catch (HttpRequestException e)
             {

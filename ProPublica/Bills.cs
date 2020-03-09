@@ -14,12 +14,20 @@ namespace ProPublica
         public List<BillModel> GetUpcomingBills(string chamber)
         {
             var response = Send<BillsResponse<List<UpcomingBills>>>($"bills/upcoming/{chamber}.json");
-            return _mapper.Map<List<BillModel>>(response.results.Select(m => m.bills).FirstOrDefault());
+            if (response?.results == null) return new List<BillModel>();
+            var data = response.results.Select(m => m.bills).FirstOrDefault();
+            return data != null
+                ? _mapper.Map<List<BillModel>>(data)
+                : new List<BillModel>();
         }
         public BillModel GetBill(string congress, string billId)
         {
             var response = Send<BillsResponse<List<Bill>>>($"{congress}/bills/{billId}.json");
-            return _mapper.Map<BillModel>(response.results.Select(b => b).FirstOrDefault());
+            if (response?.results == null) return new BillModel();
+            var data = response.results.Select(b => b).FirstOrDefault();
+            return data != null
+                ? _mapper.Map<BillModel>(data)
+                : new BillModel();
         }
     }
 }
