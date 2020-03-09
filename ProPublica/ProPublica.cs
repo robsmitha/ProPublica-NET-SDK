@@ -1,23 +1,4 @@
-﻿using AutoMapper;
-using ProPublica.Entities;
-using ProPublica.Entities.Bills;
-using ProPublica.Entities.Committee;
-using ProPublica.Entities.Lobbying;
-using ProPublica.Entities.Members;
-using ProPublica.Entities.Statements;
-using ProPublica.Entities.Votes;
-using ProPublica.Interfaces;
-using ProPublica.Models;
-using ProPublica.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-namespace ProPublica
+﻿namespace ProPublica
 {
     public class ProPublica
     {
@@ -41,5 +22,32 @@ namespace ProPublica
             set => bills = value;
         }
 
+        private Committees committees;
+        public Committees Committees
+        {
+            get => committees ??= new Committees(ApiKey);
+            set => committees = value;
+        }
+
+        private Lobbying lobbying;
+        public Lobbying Lobbying
+        {
+            get => lobbying ??= new Lobbying(ApiKey);
+            set => lobbying = value;
+        }
+
+        private Statements statements;
+        public Statements Statements
+        {
+            get => statements ??= new Statements(ApiKey);
+            set => statements = value;
+        }
+
+        private Votes votes;
+        public Votes Votes
+        {
+            get => votes ??= new Votes(ApiKey);
+            set => votes = value;
+        }
     }
 }
