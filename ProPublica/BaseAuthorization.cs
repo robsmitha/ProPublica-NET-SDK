@@ -32,14 +32,11 @@ namespace ProPublica
             client.DefaultRequestHeaders.Add("X-API-Key", ApiKey);
             try
             {
-                var requestUri = GetRequestUri(function);
-                var response = client.GetAsync(requestUri).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonSerializer.Deserialize<T>(response.Content.ReadAsStringAsync().Result);
-                }
-                return default;
-                
+                var uri = GetRequestUri(function);
+                var response = client.GetAsync(uri).Result;
+                return response.IsSuccessStatusCode
+                    ? JsonSerializer.Deserialize<T>(response.Content.ReadAsStringAsync().Result)
+                    : default;
             }
             catch (HttpRequestException e)
             {
@@ -53,13 +50,11 @@ namespace ProPublica
             client.DefaultRequestHeaders.Add("X-API-Key", ApiKey);
             try
             {
-                var requestUri = GetRequestUri(function);
-                var response = await client.GetAsync(requestUri);
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync());
-                }
-                return default;
+                var uri = GetRequestUri(function);
+                var response = await client.GetAsync(uri);
+                return response.IsSuccessStatusCode
+                       ? JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync())
+                       : default;
             }
             catch (HttpRequestException e)
             {

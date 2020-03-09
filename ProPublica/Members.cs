@@ -1,5 +1,7 @@
 ﻿using ProPublica.Entities;
 using ProPublica.Entities.Members;
+using ProPublica.Entities.Statements;
+using ProPublica.Entities.Votes;
 using ProPublica.Interfaces;
 using ProPublica.Models;
 using System;
@@ -74,6 +76,45 @@ namespace ProPublica
             return data != null
                 ? _mapper.Map<List<VoteModel>>(data)
                 : new List<VoteModel>();
+        }
+        public List<BillModel> GetMemberBills(string memberId)
+        {
+            var response = Send<Response<IEnumerable<MemberBillsResult>>>($"congress/members/{memberId}/bills/introduced");
+            if (response?.results == null) return new List<BillModel>();
+            var data = response.results.FirstOrDefault()?.bills;
+            return data != null
+                ? _mapper.Map<List<BillModel>>(data)
+                : new List<BillModel>();
+        }
+        public List<BillModel> GetMemberCosponsoredBills(string memberId)
+        {
+            var response = Send<Response<IEnumerable<MemberBillsResult>>>($"congress/members/{memberId}/bills/cosponsored");
+            if (response?.results == null) return new List<BillModel>();
+            var data = response.results.FirstOrDefault()?.bills;
+            return data != null
+                ? _mapper.Map<List<BillModel>>(data)
+                : new List<BillModel>();
+        }
+        public List<StatementModel> GetMemberStatements(string memberId, string congress)
+        {
+            var response = Send<StatementResponse<List<Statement>>>($"congress/members/{memberId}/statements/{congress}");
+            if (response?.results == null) return new List<StatementModel>();
+            var data = response.results;
+            return _mapper.Map<List<StatementModel>>(data);
+        }
+        public List<ExpensesModel> GetMemberExpenses(string id, int year, int quarter)
+        {
+            var response = Send<Response<IEnumerable<Expenses>>>($"congress/members/office_expenses/{id}/{year}/{quarter}");
+            if (response?.results == null) return new List<ExpensesModel>();
+            var data = response.results;
+            return _mapper.Map<List<ExpensesModel>>(data);
+        }
+        public List<ExplanationModel> GetMemberExplanations(string memberId, string congress)
+        {
+            var response = Send<Response<List<Explanation>>>($"congress/members/{memberId}/explanations/{congress}");
+            if (response?.results == null) return new List<ExplanationModel>();
+            var data = response.results;
+            return _mapper.Map<List<ExplanationModel>>(data);
         }
     }
 }
