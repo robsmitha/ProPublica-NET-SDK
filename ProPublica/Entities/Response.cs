@@ -10,8 +10,8 @@ namespace ProPublica.Entities
     {
         public string status { get; set; }
         public string copyright { get; set; }
-        public int num_results { get; set; }
-        public int offset { get; set; }
+        //public int num_results { get; set; }
+        //public int offset { get; set; }
         public TResult results { get; set; }
     }
 }

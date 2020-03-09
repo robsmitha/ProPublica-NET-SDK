@@ -1,9 +1,4 @@
-﻿using ProPublica.Entities.Members;
-using ProPublica.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using ProPublica.Interfaces;
 
 namespace ProPublica.Tests
 {
@@ -13,9 +8,13 @@ namespace ProPublica.Tests
         protected const string SENATE = "senate";
         protected const string HOUSE = "house";
         protected const string DEFAULT_CONGRESS = "116";
-        protected readonly ProPublicaApi _api = new ProPublicaApi(API_KEY);
-
-        protected List<MemberModel> GetMembers() => _api.GetMembers(DEFAULT_CONGRESS, SENATE);
-        protected MemberModel GetMember(string id) => _api.GetMember(id);
+        protected ProPublica ProPublica;
+        public BaseTest()
+        {
+            if(ProPublica == null)
+            {
+                ProPublica = new ProPublica(API_KEY);
+            }
+        }
     }
 }

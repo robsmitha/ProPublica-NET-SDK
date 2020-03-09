@@ -10,8 +10,8 @@ namespace ProPublica.Entities.Members
     {
         public string congress { get; set; }
         public string chamber { get; set; }
-        public int num_results { get; set; }
-        public int offset { get; set; }
+        //public int num_results { get; set; }
+        //public int offset { get; set; }
         public List<MemberListItem> members { get; set; }
     }
 }
